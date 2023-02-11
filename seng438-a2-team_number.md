@@ -2,37 +2,215 @@
 
 **Lab. Report \#2 – Requirements-Based Test Generation**
 
-| Group \#:      |     |
+| Group \#:      |  30  |
 | -------------- | --- |
-| Student Names: |     |
-|                |     |
-|                |     |
-|                |     |
+| Student Names: |Aayush Dahal     |
+|                |Justin Kuhn     |
+|                |  Sheroze Nasir   |
 
 # 1 Introduction
 
-Text…
+Black Box testing is one of the most common methods of software testing in use. This is used when project requirements are known, but the source code is not available to testers. In this lab, our team will use Black Box testing to test various methods from two classes in the JFreeChart system. We will accomplish this using Unit Testing, which is the automated process of testing various units of code using a test suite. We will construct a test suite using JUnit 4 framework, based on the requirements given in the official Javadoc for the system under test. During our testing, we will apply various techniques such as Equivalence Class Testing, Boundary Value Testing and Robustness Testing to ensure that the tests we design are as complete as possible, and cover as many variations of input parameters as we can.
+
+Another objective of this lab is to familiarize students with using mock objects in test code development. It is common for methods in classes to rely on external dependencies such as databases, filesystems and other third party applications. When testing these methods, you want to truly isolate the functionality being tested, rather than the functionality and the program’s ability to connect to the service. By using mock objects, we can mimic the behavior of the dependencies, thus being able to truly isolate the functionality we intend to test. In this lab, we will be using the jMock framework to set up the mock objects in our JUnit test suite.
+
+By the end of this lab, we will have learned the skills we need to apply Black Box testing to other projects, as well as the knowledge to create JUnit test suites based on a set of software requirements. We will also become comfortable with creating and using mock objects, knowing when and where to use them effectively. Moving forward, we will be able to use the strategies we learn in this lab as tools in everyday life, creating reliable and high quality software.
 
 # 2 Detailed description of unit test strategy
 
-// including the input partitions you have designed
+## **Test Case Plan**
+
+We are using Black Box testing to test the System Under Test (SUT), and testing the system based on the provided requirements using JUnit 4.  The first step before starting to test is reading the java doc requirements and getting a strong understanding of the system/domain. 
+
+We will be utilizing the concept of Equivalence Classes for our test cases. Equivalence classes allows us to partition the input space based on input data that can be considered the same(i.e, input data that has the same effect on the system). This allows us to group together inputs that will have the same effect on the system and then just test with one of those inputs to avoid redundant inputs.
+
+We will also be utilizing the concept of Boundary Value Testing. Programmers are likely to make errors in the boundaries/edges of equivalence classes.  Boundary Value Testing allows us to test the system with inputs at and near the boundaries of equivalence classes. For each equivalence class, we will set values for input variables towards the edges(i.e, above the max, below the min etc.). While boundary testing, we will also test for invalid input variables, i.e, null input, negative/positive out of bounds index etc.
+
+Another concept we will be utilizing is robustness testing. In order to verify the reliability of the software, it is important to test the system with input data that would mimic extreme environmental conditions to determine whether or not the system can handle it. We will accomplish this by providing input data to our SUT that consists of extreme negative and positive values. The response of the system will let us know if the developers accounted for extreme values when designing their code.
+
+## **Test Case Design**
+
+**DataUtilities Methods**
+
+**public static double calculateColumnTotal(Values2D data, int column)**
+
+* Equivalence Classes
+  * Positive values, Negative values for table element
+  * Valid Indexes
+* Boundary Value Testing
+  * Min column index(int column = 0)
+  * Max column index  (int column = column.length - 1)
+  * Null values for table element
+  * Invalid Data
+    * Negative out of bounds column index (int column < 0 )
+    * Positive out of bounds column index  (int column > column.length - 1)
+    * null value for Values2D data
+    * Empty table
+
+**public static double calculateRowTotal(Values2D data, int row)**
+
+* Equivalence Classes
+    * Positive values, Negative Values
+    * Null values
+  * Valid Indexes
+* Boundary Value Testing
+    * Min row index(int row = 0)
+    * Max row index  (int row = row.length - 1)
+    * Invalid Data
+      * Negative out of bounds row index (int row < 0 )
+      * Positive out of bounds row index  (int row > row.length - 1)
+      * null value for Values2D data
+      * Empty Table
+
+
+**public static java.lang.Number[] createNumberArray(double[] data)**
+
+* Equivalence Classes
+    * double array with positive values & negative values
+    * double array with length > 0
+* Boundary Value Testing
+    * double array of length one
+    * double array of length zero
+    * Invalid Data
+      * null value for double[] data
+
+**public static java.lang.Number[] createNumberArray2D(double[] data)**
+
+* Equivalence Classes
+    * 2D double array with positive values & negative values
+    * 2D double array with length > 0
+* Boundary Value Testing
+  * 2D double array of length one
+  * 2D double array of length zero
+  * Invalid Data
+    * null value for double[][] data
+
+**public static KeyedValues getCumulativePercentages(KeyedValues data)**
+
+* Equivalence Classes
+  * valid KeyedValues object with valid keys, indexs, & values.
+* Boundary Value Testing
+  * N/A
+  * Invalid Data
+    * null value for KeyedValues data
+
+**Range Methods**
+
+**public static Range shift(Range base, double delta)**
+
+* Equivalent classes
+    * Base range with positive values, negative values
+    * Base range that is null
+    * Delta that is positive, zero, negative
+* Boundary value testing
+    * Min positive delta value (delta = 1)
+    * Min Negative delta value (delta = -1)
+    * Invalid data:
+      * Base range is null
+      * delta is less than DOUBLE.MIN_VALUE or greater than DOUBLE.MAX_VALUE
+* Robustness Testing
+  * Base range consisting of extreme negative values (-10,000,000,000, -9,000,000,000)
+  * Base range consisting of extreme positive values (9,000,000,000, 10,000,000,000)
+  * Base range consisting of extreme negative and positive values (-10,000,000,000, 10,000,000,000)
+
+**public double constrain(double value)**
+
+* Equivalent classes
+  * Source range with positive values, negative values
+  * Value is less than source range lower bound
+  * Value is greater than source range upper bound
+  * Value is between source range’s lower and upper bound
+* Boundary value testing
+  * Value just smaller than range lower bound
+  * Value just larger than range upper bound
+  * Value between range lower and upper bound
+  * Invalid data:
+    * Value is less than DOUBLE.MIN_VALUE or greater than DOUBLE.MAX_VALUE
+* Robustness Testing
+  * Value takes on an extreme positive value (10,000,000,000)
+  * Value takes on an extreme negative value (-10,000,000,000)
+
+**public double expand(Range range, double lowerMargin, double upperMargin)**
+
+* Equivalent classes
+  * Base range with positive values, negative values
+  * lowerMargin has positive and negative values
+  * upperMargin has positive and negative values
+* Boundary value testing
+  * Invalid data:
+    * Base range is null
+    * lowerMargin is less than DOUBLE.MIN_VALUE or greater than DOUBLE.MAX_VALUE
+    * upperMargin is less than DOUBLE.MIN_VALUE or greater than DOUBLE.MAX_VALUE
+* Robustness Testing
+  * Base range consisting of extreme negative values (-10,000,000,000, -9,000,000,000)
+  * Base range consisting of extreme positive values (9,000,000,000, 10,000,000,000)
+  * Base range consisting of extreme negative and positive values (-10,000,000,000, 10,000,000,000)
+
+**public double getUpperBound()**
+
+* Equivalence classes
+  * Positive integer values, negative integer values, zero values
+  * Positive decimal values, negative decimal values
+  * Null values
+  * Valid Indexes
+* Boundary value testing
+  * Range with the same lower and upper value
+  * Range with (-lower, -upper), (-lower, 0), (-lower, +upper), (+lower,+upper), (0, +upper) Integer values 
+  * Range with (-lower, -upper), (-lower, +upper), (+lower, +upper) Decimal values.
+  * Invalid Data
+    * Null Range object
+
+**public double getLength()**
+
+* Equivalence classes
+  * Positive integer values, negative integer values, zero values
+  * Positive decimal values, negative decimal values
+  * Null values
+  * Valid Indexes
+* Boundary value testing
+  * Range with the same lower and upper value
+  * Range with (-lower, -upper), (-lower, 0), (-lower, +upper), (+lower,+upper), (0, +upper) Integer values 
+  * Range with (-lower, -upper), (-lower, +upper), (+lower, +upper) Decimal values.
+  * Invalid Data
+    * Null Range object
 
 # 3 Test cases developed
 
-Text…
+![Screen Shot 2023-02-10 at 11 26 42 PM](https://user-images.githubusercontent.com/80851741/218244118-fe59e837-183c-4619-a306-944edf99e1c4.png)
+![Screen Shot 2023-02-10 at 11 28 01 PM](https://user-images.githubusercontent.com/80851741/218244160-95a3bebe-4b7a-4e91-b0ed-2db22cb37e5b.png)
+![Screen Shot 2023-02-10 at 11 28 31 PM](https://user-images.githubusercontent.com/80851741/218244177-4068df35-7e2f-464b-911c-8f6e318d47ea.png)
+![Screen Shot 2023-02-10 at 11 30 35 PM](https://user-images.githubusercontent.com/80851741/218244253-52bb56ff-495b-4294-bab1-3f842c889683.png)
+![Screen Shot 2023-02-10 at 11 31 05 PM](https://user-images.githubusercontent.com/80851741/218244269-eb01f02f-93da-44c4-ac91-48b5f8e73525.png)
+![Screen Shot 2023-02-10 at 11 31 26 PM](https://user-images.githubusercontent.com/80851741/218244279-10c4a931-d746-43ec-adbf-6d088590f520.png)
+![Screen Shot 2023-02-10 at 11 31 44 PM](https://user-images.githubusercontent.com/80851741/218244290-44cb9f6d-e79e-4251-9591-16f47a9ec02b.png)
+![Screen Shot 2023-02-10 at 11 32 59 PM](https://user-images.githubusercontent.com/80851741/218244330-938a8602-5dac-4028-b1f9-8dd3afa6df8a.png)
+![Screen Shot 2023-02-10 at 11 33 16 PM](https://user-images.githubusercontent.com/80851741/218244342-f1037c36-1ef0-4acd-86a4-b5552677b90b.png)
+![Screen Shot 2023-02-10 at 11 33 26 PM](https://user-images.githubusercontent.com/80851741/218244353-efae9739-861b-4440-a7b3-37f64dee687d.png)
 
-// write down the name of the test methods and classes. Organize the based on
-the source code method // they test. identify which tests cover which partitions
-you have explained in the test strategy section //above
+## Benefits and Drawbacks of Mocking
+
+**Benefits**
+* Removes external dependencies from the function being tested since we are mocking the behavior of the dependencies.
+    * This truly isolates the functionality of the system being tested.
+  * This allows the unit tests to solely focus on the functionality of the function being tested.
+* Mocking interaction with databases, file systems and any other third party external services are likely to increase the speed of the unit tests. Since the tests aren’t actually interacting with the real external service, the overhead that occurs in the process of interacting with the services is removed.
+
+**Drawbacks**
+* Mistakes can be made when mocking an external dependency. This can happen if the programmer doing the mocking is unaware of the mocking framework or does not have a solid understanding of external dependencies requirements. 
+  * This can cause the unit test to act differently than intended and give false passes and failures.
 
 # 4 How the team work/effort was divided and managed
 
-Text…
+Upon receiving the assignment, our group met in person to discuss the best approach to divide the work. We decided it was best to allow each member to write test cases for both classes, so that everyone familiarized themselves with the classes being tested. This also allowed each member to gain experience writing test cases with mock objects using the jMock framework, which was required in this lab. During meetings, we would practice peer programming by taking turns writing tests, evaluating each other’s work and answering questions the others may have. This allowed us to overcome challenges together, prevent them from happening again and receive immediate feedback on our test implementation.
+
+Note: One principle we tried to follow when dividing work was, to the extent the circumstances allow, give team members the freedom to pick work that they expertise in and they enjoy doing.
 
 # 5 Difficulties encountered, challenges overcome, and lessons learned
 
-Text…
+The main difficulty encountered by the group was setting up the System Under Test on each group member's devices. With this came the challenge of having one central System Under Test Git repository as the jar files were local to each group member's device. To overcome this problem, we decided to edit our files on our own devices and push them to the repository after everyone had finished writing their tests. This way, we would avoid any merge conflicts and library conflicts that would arise from members constantly updating files on the central SUT repository. 
+
+Through this lab, we learned how to construct a JUnit test suite, and use blackbox testing to formulate unit tests based on equivalence class tests, boundary value tests and robustness tests. We also learnt how to use mocking to mock dependencies with other classes to truly isolate the function under test.
 
 # 6 Comments/feedback on the lab itself
 
-Text…
+Our group thought the lab was useful, and a good way to familiarize ourselves with blackbox testing and unit testing using JUnit. Overall the lab was a good introduction to creating a test suite, and using mock objects to mimic the behavior of objects without having to rely on external dependencies. In particular, we enjoyed being able to write our own code for this lab, as well as the collaborative nature of this assignment. Throughout the lab, we also got to practice useful skills such as time management, team organization, and communicating effectively in a software team environment.
